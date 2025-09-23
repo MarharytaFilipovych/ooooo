@@ -133,7 +133,7 @@ As in real systems, new features will be added later. Leave at least one week fr
 Maximum points: 8
 - 1 point total for steps 1-3;
 - 1 point for steps 4-8
-- 2 points for theoretical question on SOLID (can be gained only offline). Theoretical questions can be requested only when there are at least 3 completed parts in repository.
+- 2 points for theoretical (and practical) questions on SOLID (can be gained only offline). Theoretical questions can be requested only when there are at least 4 completed parts in the repository. Questions are team-based, so the whole team must come to the practice session to answer.
 
 ### Deadlines
 You must deliver MVP with steps 1-3 no later than October 1 23:59. Soft Deadline for assignment is October 12, 23:59. Hard deadline (50% penalty) is October 19, 23:59
