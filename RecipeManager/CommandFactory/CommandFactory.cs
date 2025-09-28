@@ -1,16 +1,17 @@
-using RecipeManager.Commands;
+using RecipeManager.Storage;
 
 namespace RecipeManager.CommandFactory;
 
-public class CommandFactory : ICommandFactory
+public static class CommandFactory
 {
-    public void Register(ICommand command)
+    public static Context Create()
     {
-        throw new NotImplementedException();
-    }
+        var ingredientStorage = new InMemoryIngredientStorage();
+        var recipeStorage = new InMemoryIngredientStorage();
+        var planStorage = new InMemoryPlanStorage();
+        
+        var context = new Context();
 
-    public List<ICommand> ListCommands()
-    {
-        throw new NotImplementedException();
+        return context;
     }
 }

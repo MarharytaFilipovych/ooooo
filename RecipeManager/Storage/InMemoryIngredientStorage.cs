@@ -2,19 +2,13 @@ using RecipeManager.Entities;
 
 namespace RecipeManager.Storage;
 
-public class InMemoryIngredientStorage : IStorage<Ingredient>
+public class InMemoryIngredientStorage : IIngredientStorage
 {
-    private static readonly Dictionary<string, Ingredient> Ingredients = new();
+    private static readonly Dictionary<string, Ingredient> Ingredients = new(StringComparer.OrdinalIgnoreCase);
     
-    public bool Add(Ingredient entity)
-    {
-        return Ingredients.TryAdd(entity.Name, entity);
-    }
+    public bool Add(Ingredient entity) => Ingredients.TryAdd(entity.Name, entity);
 
-    public bool Remove(string name)
-    {
-        return Ingredients.Remove(name);
-    }
+    public bool Remove(string name) => Ingredients.Remove(name);
 
     public bool Update(Ingredient entity)
     {
@@ -29,21 +23,16 @@ public class InMemoryIngredientStorage : IStorage<Ingredient>
         return ingredient;
     }
 
-    public int GetTotalQuantity()
-    {
-        return Ingredients.Count;
-    }
+    public int GetTotalQuantity() => Ingredients.Count;
 
-    public List<Ingredient> GetAll()
-    {
-        return Ingredients.Values.ToList();
-    }
+    public List<Ingredient> GetAll() => Ingredients.Values.ToList();
 
-    public Ingredient? Consume(Ingredient ingredient)
+    public bool Consume(Ingredient ingredient)
     {
-        if (!Ingredients.TryGetValue(ingredient.Name, out var value)) return null;
-        Ingredients.Remove(value.Name);
-        return value;
-
+        if (!Ingredients.TryGetValue(ingredient.Name, out var value)) return false;
+        if (value.Quantity < ingredient.Quantity) return false;
+        value.Quantity -= ingredient.Quantity;
+        Ingredients[ingredient.Name] = value;
+        return true;
     }
 }

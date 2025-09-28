@@ -4,24 +4,17 @@ namespace RecipeManager.Storage;
 
 public class InMemoryPlanStorage : IStorage<Plan>
 {
-    private static readonly Dictionary<string, Plan> Plans = new();
+    private static readonly Dictionary<string, Plan> Plans = new(StringComparer.OrdinalIgnoreCase);
 
-    public bool Add(Plan entity)
-    {
-        return Plans.TryAdd(entity.Name, entity);
-    }
+    public bool Add(Plan entity) => Plans.TryAdd(entity.Name, entity);
 
-    public bool Remove(string name)
-    {
-        return Plans.Remove(name);
-    }
+    public bool Remove(string name) => Plans.Remove(name);
 
     public bool Update(Plan entity)
     {
         if (!Plans.ContainsKey(entity.Name)) return false;
         Plans[entity.Name] = entity;
         return true;
-
     }
 
     public Plan? GetEntityByName(string name)
@@ -30,13 +23,7 @@ public class InMemoryPlanStorage : IStorage<Plan>
         return plan;
     }
 
-    public int GetTotalQuantity()
-    {
-        return Plans.Count;
-    }
+    public int GetTotalQuantity() => Plans.Count;
 
-    public List<Plan> GetAll()
-    {
-        return Plans.Values.ToList();
-    }
+    public List<Plan> GetAll() => Plans.Values.ToList();
 }

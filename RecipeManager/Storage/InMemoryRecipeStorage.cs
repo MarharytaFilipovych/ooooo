@@ -4,17 +4,11 @@ namespace RecipeManager.Storage;
 
 public class InMemoryRecipeStorage: IStorage<Recipe>
 {
-    private static readonly Dictionary<string, Recipe> Recipes = new();
+    private static readonly Dictionary<string, Recipe> Recipes = new(StringComparer.OrdinalIgnoreCase);
 
-    public bool Add(Recipe entity)
-    {
-        return Recipes.TryAdd(entity.Name, entity);
-    }
+    public bool Add(Recipe entity) => Recipes.TryAdd(entity.Name, entity);
 
-    public bool Remove(string name)
-    {
-        return Recipes.Remove(name);
-    }
+    public bool Remove(string name) => Recipes.Remove(name);
 
     public bool Update(Recipe entity)
     {
@@ -29,14 +23,7 @@ public class InMemoryRecipeStorage: IStorage<Recipe>
         return recipe;
     }
 
-    public int GetTotalQuantity()
-    {
-        return Recipes.Count;
-    }
-
-    public List<Recipe> GetAll()
-    {
-        return Recipes.Values.ToList();
-    }
+    public int GetTotalQuantity() => Recipes.Count;
     
+    public List<Recipe> GetAll() => Recipes.Values.ToList();
 }

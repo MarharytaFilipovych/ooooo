@@ -8,4 +8,4 @@ public interface IStorage<T>
     T? GetEntityByName(string name);
     int GetTotalQuantity();
     List<T> GetAll();
-}
+} 

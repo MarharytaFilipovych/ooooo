@@ -2,7 +2,11 @@ namespace RecipeManager.Entities;
 
 public class Ingredient
 {
-    public Ingredient(int quantity, Unit unit, string name)
+    public string Name { get; }
+    public decimal Quantity { get; set; }
+    public Unit Unit { get;  }
+    
+    public Ingredient(string name, decimal quantity, Unit unit)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Ingredient name cannot be empty");
@@ -12,8 +16,4 @@ public class Ingredient
         Quantity = quantity;
         Unit = unit;
     }
-
-    public string Name { get; }
-    public int Quantity { get; }
-    public Unit Unit { get;  }
 }
