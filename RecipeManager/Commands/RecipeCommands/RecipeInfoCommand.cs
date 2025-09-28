@@ -1,3 +1,5 @@
+using RecipeManager.Commands.BaseCommands;
+
 namespace RecipeManager.Commands.RecipeCommands;
 
-public class RecipeInfoCommand(string name) : RecipeWithNameCommand(name) { }
+public class CommandInfo(string name) : CommandWithFirstArgName(name) { }

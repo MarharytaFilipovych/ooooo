@@ -20,7 +20,7 @@ public class RecipeAddDefinition : ICommandDefinition
 
         var name = args[2];
 
-        command = new RecipeAddCommand(name);
+        command = new CommandAdd(name);
         return true;
     }
 }

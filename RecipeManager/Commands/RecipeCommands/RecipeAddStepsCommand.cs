@@ -1,6 +1,8 @@
+using RecipeManager.Commands.BaseCommands;
+
 namespace RecipeManager.Commands.RecipeCommands;
 
-public class RecipeAddStepsCommand(string name, string stepText) : RecipeWithNameCommand(name)
+public class CommandAddSteps(string name, string stepText) : CommandWithFirstArgName(name)
 {
     public string StepText { get; } = stepText;
 

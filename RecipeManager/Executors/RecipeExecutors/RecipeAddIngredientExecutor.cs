@@ -5,9 +5,9 @@ using RecipeManager.Storage;
 namespace RecipeManager.Executors.RecipeExecutors;
 
 public class RecipeAddIngredientExecutor(IStorage<Recipe> recipeStorage, IStorage<Ingredient> ingredientStorage) 
-    : ICommandExecutor<RecipeAddIngredientCommand>
+    : ICommandExecutor<CommandAddIngredient>
 {
-    public ExecuteResult Execute(RecipeAddIngredientCommand command)
+    public ExecuteResult Execute(CommandAddIngredient command)
     {
         var recipe = recipeStorage.GetEntityByName(command.Name);
         if (recipe == null)

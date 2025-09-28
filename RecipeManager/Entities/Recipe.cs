@@ -3,8 +3,8 @@ namespace RecipeManager.Entities;
 public class Recipe
 {
     public string Name { get;  }
-    private List<string> Steps { get; }
-    private List<string> Ingredients { get; }
+    public List<string> Steps { get; }
+    public List<string> Ingredients { get; }
 
     public Recipe(string name)
     {
@@ -36,5 +36,6 @@ public class Recipe
         return $"Recipe {Name}:\n {Steps.Count} steps:\n {string.Join(", ", Steps)}\n " +
                $" {Ingredients.Count} ingredients:\n {string.Join(", ", Ingredients)}";
     }
+
 }
 

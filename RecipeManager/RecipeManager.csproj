@@ -7,10 +7,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="CommandDefinitions\PlanDefinitions\" />
-      <Folder Include="Commands\PlanCommands\" />
-      <Folder Include="Executors\PlanExecutors\" />
-    </ItemGroup>
-
 </Project>

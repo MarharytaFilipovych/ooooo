@@ -34,7 +34,7 @@ public class RecipeAddIngredientDefinition : ICommandDefinition
             return false;
         }
         
-        command = new RecipeAddIngredientCommand(name, ingredientName, quantity, unit);
+        command = new CommandAddIngredient(name, ingredientName, quantity, unit);
         return true;
         
     }

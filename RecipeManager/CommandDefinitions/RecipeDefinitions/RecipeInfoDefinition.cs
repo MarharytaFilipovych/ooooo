@@ -19,7 +19,7 @@ public class RecipeInfoDefinition : ICommandDefinition
 
         var name = args[2];
 
-        command = new RecipeInfoCommand(name);
+        command = new CommandInfo(name);
         return true;
     }
 }

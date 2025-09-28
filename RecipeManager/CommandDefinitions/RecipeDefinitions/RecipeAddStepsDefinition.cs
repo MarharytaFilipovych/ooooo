@@ -21,7 +21,7 @@ public class RecipeAddStepsDefinition : ICommandDefinition
         var name = args[3];
         var steps = args[4];
 
-        command = new RecipeAddStepsCommand(name, steps);
+        command = new CommandAddSteps(name, steps);
         return true;
     }
 }

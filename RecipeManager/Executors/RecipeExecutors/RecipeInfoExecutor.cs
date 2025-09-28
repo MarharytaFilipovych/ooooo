@@ -4,9 +4,9 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.Executors.RecipeExecutors;
 
-public class RecipeInfoExecutor(IStorage<Recipe> storage) : ICommandExecutor<RecipeInfoCommand>
+public class RecipeInfoExecutor(IStorage<Recipe> storage) : ICommandExecutor<CommandInfo>
 {
-    public ExecuteResult Execute(RecipeInfoCommand command)
+    public ExecuteResult Execute(CommandInfo command)
     {
         var recipe = storage.GetEntityByName(command.Name);
         Console.WriteLine(recipe?.ToString() 

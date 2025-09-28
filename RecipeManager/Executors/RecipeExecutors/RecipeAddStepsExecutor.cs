@@ -4,9 +4,9 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.Executors.RecipeExecutors;
 
-public class RecipeAddStepsExecutor(IStorage<Recipe> storage) : ICommandExecutor<RecipeAddStepsCommand>
+public class RecipeAddStepsExecutor(IStorage<Recipe> storage) : ICommandExecutor<CommandAddSteps>
 {
-    public ExecuteResult Execute(RecipeAddStepsCommand command)
+    public ExecuteResult Execute(CommandAddSteps command)
     {
         var recipe = storage.GetEntityByName(command.Name);
         if (recipe == null)

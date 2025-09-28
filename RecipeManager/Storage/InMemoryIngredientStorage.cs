@@ -37,4 +37,12 @@ public class InMemoryIngredientStorage : IIngredientStorage
         Ingredients[ingredient.Name] = value;
         return true;
     }
+
+    public List<Ingredient> GetIngredientsByNames(IEnumerable<string> names)
+    {
+        return names
+            .Where(name => Ingredients.ContainsKey(name))
+            .Select(name => Ingredients[name])
+            .ToList();    
+    }
 }
