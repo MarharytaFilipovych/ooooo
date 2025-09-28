@@ -26,4 +26,5 @@ public class InMemoryPlanStorage : IStorage<Plan>
     public int GetTotalQuantity() => Plans.Count;
 
     public List<Plan> GetAll() => Plans.Values.ToList();
+    public bool ExistsByName(string name) => Plans.ContainsKey(name);
 }

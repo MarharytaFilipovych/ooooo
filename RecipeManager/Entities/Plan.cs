@@ -19,4 +19,10 @@ public class Plan
         if (servingsMultiplier <= 0)
             throw new ArgumentException("Servings multiplier must be greater than 0!");
     }
+
+    public override string ToString()
+    {
+        return $"Plan {Name}: recipe {RecipeName}, " +
+               $"date: {Date}, {ServingsMultiplier} servings";
+    }
 }

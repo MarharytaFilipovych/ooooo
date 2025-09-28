@@ -16,4 +16,9 @@ public class Ingredient
         Quantity = quantity;
         Unit = unit;
     }
+
+    public override string ToString()
+    {
+        return $"Ingredient {Name}, {Quantity} {Unit}";
+    }
 }

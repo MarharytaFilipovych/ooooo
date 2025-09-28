@@ -6,5 +6,5 @@ public interface ICommandDefinition
 {
     string Name { get;  }
     string Description { get;  }
-    ParseResult Parse(string[] args);
+    bool TryParse(string[] args, out ICommand? command, out string? error);
 }

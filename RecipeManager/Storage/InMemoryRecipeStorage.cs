@@ -26,4 +26,5 @@ public class InMemoryRecipeStorage: IStorage<Recipe>
     public int GetTotalQuantity() => Recipes.Count;
     
     public List<Recipe> GetAll() => Recipes.Values.ToList();
+    public bool ExistsByName(string name) => Recipes.ContainsKey(name);
 }

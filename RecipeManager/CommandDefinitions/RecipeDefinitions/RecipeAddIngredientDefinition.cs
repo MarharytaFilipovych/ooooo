@@ -1,26 +1,26 @@
 using RecipeManager.Commands;
-using RecipeManager.Commands.StockCommands;
+using RecipeManager.Commands.RecipeCommands;
 using RecipeManager.Entities;
 
-namespace RecipeManager.CommandDefinitions.StockDefinitions;
+namespace RecipeManager.CommandDefinitions.RecipeDefinitions;
 
-public class StockAddDefinition : ICommandDefinition
+public class RecipeAddIngredientDefinition : ICommandDefinition
 {
-    public string Name => "stock add";
-    public string Description => "stock add \"<ingredient>\" <quantity> <unit>";
-
+    public string Name => "recipe add-ingredient";
+    public string Description => "recipe add-ingredient \"<recipe_name>\" \"<ingredient>\" <quantity> <unit>";
+   
     public bool TryParse(string[] args, out ICommand? command, out string? error)
     {
         error = null;
         command = null;
-        if (args.Length != 5)
+        if (args.Length != 6)
         {
             error = $"Wrong usage, bro: {Description}";
             return false;
         }
 
-        var ingredientName = args[2];
-        
+        var name = args[2];
+        var ingredientName = args[3];
         if (!decimal.TryParse(args[3], out var quantity) || quantity < 0)
         {
             error = $"The quantity was supposed to be numeric and greater than 0" +
@@ -33,8 +33,9 @@ public class StockAddDefinition : ICommandDefinition
             error = $"Supported units: {string.Join(", ", Enum.GetNames(typeof(Unit)))}";
             return false;
         }
-
-        command = new StockAddCommand(ingredientName, quantity, unit);
+        
+        command = new RecipeAddIngredientCommand(name, ingredientName, quantity, unit);
         return true;
+        
     }
 }

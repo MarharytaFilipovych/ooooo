@@ -26,6 +26,8 @@ public class InMemoryIngredientStorage : IIngredientStorage
     public int GetTotalQuantity() => Ingredients.Count;
 
     public List<Ingredient> GetAll() => Ingredients.Values.ToList();
+    
+    public bool ExistsByName(string name) => Ingredients.ContainsKey(name);
 
     public bool Consume(Ingredient ingredient)
     {

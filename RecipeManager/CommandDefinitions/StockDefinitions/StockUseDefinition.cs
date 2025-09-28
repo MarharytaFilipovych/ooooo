@@ -1,3 +1,4 @@
+using RecipeManager.Commands;
 using RecipeManager.Commands.StockCommands;
 using RecipeManager.Entities;
 
@@ -8,31 +9,33 @@ public class StockUseDefinition : ICommandDefinition
     public string Name => "stock use";
     public string Description => "stock use \"<ingredient>\" <quantity> <unit> [<reason>]";
     
-    public ParseResult Parse(string[] args)
+    public bool TryParse(string[] args, out ICommand? command, out string? error)
     {
-        var result = new ParseResult();
+        error = null;
+        command = null;
         if (args.Length < 5)
         {
-            result.Error = $"Wrong usage, bro: {Description}";
-            return result;
+            error = $"Wrong usage, bro: {Description}";
+            return false;
         }
         var ingredientName = args[2];
         
         if (!decimal.TryParse(args[3], out var quantity) || quantity < 0)
         {
-            result.Error = $"The quantity was supposed to be numeric and greater " +
+            error = $"The quantity was supposed to be numeric and greater " +
                            $"than 0, not you strange value: {args[3]}";
+            return false;
         }
 
         if (!Enum.TryParse(args[4], out Unit unit))
         {
-            result.Error = $"Supported units: {string.Join(", ", Enum.GetNames(typeof(Unit)))}";
+            error = $"Supported units: {string.Join(", ", Enum.GetNames(typeof(Unit)))}";
         }
 
         string? reason = null;
         
         if (args.Length > 5) reason = args[5];
-        result.Command = new StockUseCommand(ingredientName, quantity, unit, reason);
-        return result;
+        command = new StockUseCommand(ingredientName, quantity, unit, reason);
+        return true;
     }
 }

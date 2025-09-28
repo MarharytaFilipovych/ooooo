@@ -59,22 +59,19 @@ public class Context
             return executeResult;
         }
 
-        var parseResult = definition.Parse(args);
 
-        if (parseResult.Error != null)
+        if (!definition.TryParse(args, out var command, out var parsingError))
         {
-            error = parseResult.Error;
+            error = parsingError;
             return executeResult;
         }
 
-        var commandType = parseResult.GetType();
 
-        if (!Executors.TryGetValue(commandType, out var executor))
-        {
-            error = $"There is no any register executor for this command {commandType.Name}";
-            return executeResult;
-        }
-        
-        return executor.Execute(parseResult.Command!);
+        var commandType = command!.GetType();
+
+        if (Executors.TryGetValue(commandType, out var executor)) return executor.Execute(command);
+        error = $"There is no any register executor for this command {commandType.Name}";
+        return executeResult;
+
     }
 }
