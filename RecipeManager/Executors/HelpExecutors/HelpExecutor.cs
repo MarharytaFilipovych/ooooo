@@ -1,4 +1,5 @@
 using RecipeManager.CommandDefinitions;
+using RecipeManager.Commands;
 using RecipeManager.Commands.HelpCommands;
 
 namespace RecipeManager.Executors.HelpExecutors;
@@ -10,7 +11,7 @@ public class HelpExecutor(List<ICommandDefinition> commands) :
     {
         Console.WriteLine("Here is your precious help:");
         commands.ForEach(c =>
-            Console.WriteLine(c.Description));
+            Console.WriteLine($"- {c.Description}"));
         return ExecuteResult.Continue;
     }
 }

@@ -1,3 +1,4 @@
+using RecipeManager.Commands;
 using RecipeManager.Commands.RecipeCommands;
 using RecipeManager.Entities;
 using RecipeManager.Storage;
@@ -10,7 +11,7 @@ public class RecipeInfoExecutor(IStorage<Recipe> storage) : ICommandExecutor<Com
     {
         var recipe = storage.GetEntityByName(command.Name);
         Console.WriteLine(recipe?.ToString() 
-                          ?? $"Recipe with a name {command.Name} was not " +
+                          ?? $"Recipe with a name \"{command.Name}\" was not " +
                           $"found! No ingredients added.");
         
         return ExecuteResult.Continue;

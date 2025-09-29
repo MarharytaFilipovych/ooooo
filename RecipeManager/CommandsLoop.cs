@@ -1,3 +1,5 @@
+using RecipeManager.Commands;
+
 namespace RecipeManager;
 
 public class CommandsLoop(Context context)
@@ -8,7 +10,7 @@ public class CommandsLoop(Context context)
                           "want to abandon us or 'help' if you are lost a little bit.");
         while (true)
         {
-            Console.Write("❤️ ");
+            Console.Write("* ");
             var line = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(line)) continue;
             var args = SplitArgs(line);

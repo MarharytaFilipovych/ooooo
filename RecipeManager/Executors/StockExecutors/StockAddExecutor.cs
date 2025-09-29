@@ -1,3 +1,4 @@
+using RecipeManager.Commands;
 using RecipeManager.Commands.StockCommands;
 using RecipeManager.Entities;
 using RecipeManager.Storage;
@@ -11,8 +12,8 @@ public class StockAddExecutor(IStorage<Ingredient> storage) :
     {
         var ingredient = new Ingredient(command.IngredientName, command.Quantity, command.Unit);
         Console.WriteLine(storage.Add(ingredient)
-            ? $"Your ingredient {ingredient} was successfully added"
-            : $"Ingredient with the name {ingredient.Name} has already been added!");
+            ? $"Your ingredient \"{ingredient}\" was successfully added to our stock!"
+            : $"Ingredient with the name \"{ingredient.Name}\" has already been added!");
         return ExecuteResult.Continue;
     }
 }

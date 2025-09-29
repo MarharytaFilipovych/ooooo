@@ -7,8 +7,8 @@ namespace RecipeManager;
 
 public class Context
 {
-    private static readonly Dictionary<string, ICommandDefinition> CommandDefinitions = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly Dictionary<Type, ITypedExecutor> Executors = new();
+    private readonly Dictionary<string, ICommandDefinition> _commandDefinitions = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<Type, ITypedExecutor> _executors = new();
     
     private interface ITypedExecutor
     {
@@ -25,11 +25,11 @@ public class Context
     public void Register<TCommand>(ICommandDefinition commandDefinition, ICommandExecutor<TCommand> executor)
         where TCommand : ICommand
     {
-        CommandDefinitions[commandDefinition.Name] = commandDefinition;
-        Executors[typeof(TCommand)] = new TypedExecutor<TCommand>(executor);
+        _commandDefinitions[commandDefinition.Name] = commandDefinition;
+        _executors[typeof(TCommand)] = new TypedExecutor<TCommand>(executor);
     }
 
-    public List<ICommandDefinition> Commands => CommandDefinitions.Values.ToList();
+    public List<ICommandDefinition> Commands => _commandDefinitions.Values.ToList();
 
 
     public ExecuteResult GetExecutionResult(string[] args, out string? error)
@@ -43,17 +43,17 @@ public class Context
             return executeResult;
         }
         
-        if (!Enum.TryParse(args[0], out CommandGroup group))
+        if (!Enum.TryParse(args[0], ignoreCase: true, out CommandGroup group))
         {
             error = $"Unrecognized command! You can use one of: {string.Join(", ", Enum.GetNames<CommandGroup>())}";
             return executeResult;
         }
         
         var commandName = group.ToString().ToLower();
-        if (args.Length > 1) commandName += args[1].ToLower();
+        if (args.Length > 1) commandName += " " + args[1].ToLower();
         
 
-        if (!CommandDefinitions.TryGetValue(commandName, out var definition))
+        if (!_commandDefinitions.TryGetValue(commandName, out var definition))
         {
             error = "Hmmm, we don't know such a command!!!";
             return executeResult;
@@ -69,7 +69,7 @@ public class Context
 
         var commandType = command!.GetType();
 
-        if (Executors.TryGetValue(commandType, out var executor)) return executor.Execute(command);
+        if (_executors.TryGetValue(commandType, out var executor)) return executor.Execute(command);
         error = $"There is no any register executor for this command {commandType.Name}";
         return executeResult;
 

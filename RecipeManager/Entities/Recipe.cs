@@ -33,8 +33,25 @@ public class Recipe
 
     public override string ToString()
     {
-        return $"Recipe {Name}:\n {Steps.Count} steps:\n {string.Join(", ", Steps)}\n " +
-               $" {Ingredients.Count} ingredients:\n {string.Join(", ", Ingredients)}";
+        var result = new System.Text.StringBuilder();
+        
+        result.AppendLine($"Recipe: {Name}");
+        result.AppendLine();
+        
+        result.AppendLine($"Ingredients ({Ingredients.Count}):");
+        foreach (var ingredient in Ingredients)
+        {
+            result.AppendLine($"  - {ingredient}");
+        }
+        
+        result.AppendLine();
+        result.AppendLine($"Steps ({Steps.Count}):");
+        for (int i = 0; i < Steps.Count; i++)
+        {
+            result.AppendLine($"  {i + 1}. {Steps[i]}");
+        }
+        
+        return result.ToString();
     }
 
 }

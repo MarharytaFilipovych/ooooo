@@ -22,7 +22,10 @@ public class Plan
 
     public override string ToString()
     {
-        return $"Plan {Name}: recipe {RecipeName}, " +
-               $"date: {Date}, {ServingsMultiplier} servings";
+        var multiplierText = ServingsMultiplier == 1 
+            ? "" 
+            : $" (x{ServingsMultiplier})";
+            
+        return $"{Name}: {RecipeName}{multiplierText} on {Date:yyyy-MM-dd}";
     }
 }

@@ -19,6 +19,6 @@ public class Ingredient
 
     public override string ToString()
     {
-        return $"Ingredient {Name}, {Quantity} {Unit}";
+        return $"{Name}, {Quantity} {Unit}";
     }
 }

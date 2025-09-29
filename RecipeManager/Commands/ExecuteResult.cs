@@ -1,4 +1,4 @@
-namespace RecipeManager;
+namespace RecipeManager.Commands;
 
 public enum ExecuteResult
 {

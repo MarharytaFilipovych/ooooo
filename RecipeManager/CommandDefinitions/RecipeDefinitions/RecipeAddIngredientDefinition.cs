@@ -21,14 +21,14 @@ public class RecipeAddIngredientDefinition : ICommandDefinition
 
         var name = args[2];
         var ingredientName = args[3];
-        if (!decimal.TryParse(args[3], out var quantity) || quantity < 0)
+        if (!decimal.TryParse(args[4], out var quantity) || quantity < 0)
         {
             error = $"The quantity was supposed to be numeric and greater than 0" +
                            $", not you strange value: {args[3]}";
             return false;
         }
 
-        if (!Enum.TryParse(args[4], out Unit unit))
+        if (!Enum.TryParse(args[5], ignoreCase: true, out Unit unit))
         {
             error = $"Supported units: {string.Join(", ", Enum.GetNames(typeof(Unit)))}";
             return false;

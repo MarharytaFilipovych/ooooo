@@ -1,3 +1,4 @@
+using RecipeManager.Commands;
 using RecipeManager.Commands.ShoppingCommands;
 using RecipeManager.Entities;
 using RecipeManager.Storage;
@@ -77,9 +78,9 @@ public class ShoppingExportExecutor(IStorage<Plan> planStorage, IRecipeStorage r
     {
         Console.WriteLine("Shopping List:");
         
-        if (shoppingList.Count == 0) Console.WriteLine("No ingredients needed.");
+        if (shoppingList.Count == 0) Console.WriteLine("No ingredients needed because you don't have any plans!.");
         else shoppingList.ForEach(item => 
-                Console.WriteLine($"- {item.IngredientName }: {item.TotalQuantity:F1} {item.Unit}"));
+                Console.WriteLine($"- \"{item.IngredientName }\": {item.TotalQuantity} {item.Unit}"));
     }
 
     private record ShoppingListItem

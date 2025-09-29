@@ -1,3 +1,4 @@
+using RecipeManager.Commands;
 using RecipeManager.Commands.PlanCommands;
 using RecipeManager.Entities;
 using RecipeManager.Storage;
@@ -11,8 +12,8 @@ public class PlanAddExecutor(IStorage<Plan> storage) : ICommandExecutor<PlanAddC
         var plan = new Plan(command.Name, command.RecipeName, command.Date, command.ServingsMultiplier);
         Console.WriteLine(
             storage.Add(plan)
-                ? $"Plan {plan} was successfully added!"
-                : $"Plan with a name {command.Name} has already been added!"
+                ? $"Plan \"{command.Name}\" was successfully added!"
+                : $"Plan with a name \"{command.Name}\" has already been added!"
         );
         return ExecuteResult.Continue;
     }

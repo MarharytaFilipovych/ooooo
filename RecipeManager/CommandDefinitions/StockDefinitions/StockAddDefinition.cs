@@ -28,7 +28,7 @@ public class StockAddDefinition : ICommandDefinition
             return false;
         }
 
-        if (!Enum.TryParse(args[4], out Unit unit))
+        if (!Enum.TryParse(args[4], ignoreCase: true, out Unit unit))
         {
             error = $"Supported units: {string.Join(", ", Enum.GetNames(typeof(Unit)))}";
             return false;
