@@ -15,5 +15,5 @@ public class ActionResult
 
     public static ActionResult Good(string message, object? data = null) => new(true, message, data);
 
-    public static ActionResult Error(string message, object? data = null) => new(false, message, data);
+    public static ActionResult Bad(string message, object? data = null) => new(false, message, data);
 }
