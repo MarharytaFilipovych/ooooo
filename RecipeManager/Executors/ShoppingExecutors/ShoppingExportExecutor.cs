@@ -5,17 +5,15 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.Executors.ShoppingExecutors;
 
-public class ShoppingExportExecutor(IStorage<Plan> planStorage, IRecipeStorage recipeStorage,
-    IIngredientStorage ingredientStorage) : ICommandExecutor<ShoppingExportCommand>
+public class ShoppingExportExecutor(IStorage<Plan> planStorage, IRecipeStorage recipeStorage)
+    : ICommandExecutor<ShoppingExportCommand>
 {
     public ExecuteResult Execute(ShoppingExportCommand command)
     {
         var plans = planStorage.GetAll();
         var recipeMap = GetRecipeMap(plans);
-        var ingredientMap = GetIngredientMap(plans, recipeMap);
-        var shoppingList = GenerateShoppingList(plans, recipeMap, ingredientMap);
         
-        PrintShoppingList(shoppingList);
+        PrintShoppingList(plans, recipeMap);
         
         return ExecuteResult.Continue;
     }
@@ -27,66 +25,34 @@ public class ShoppingExportExecutor(IStorage<Plan> planStorage, IRecipeStorage r
         return recipes.ToDictionary(r => r.Name, StringComparer.OrdinalIgnoreCase);
     }
 
-    private Dictionary<string, Ingredient> GetIngredientMap(List<Plan> plans, Dictionary<string, Recipe> recipeLookup)
-    {
-        var allIngredientNames = plans
-            .Where(plan => recipeLookup.ContainsKey(plan.RecipeName))
-            .SelectMany(plan => recipeLookup[plan.RecipeName].Ingredients)
-            .Distinct(StringComparer.OrdinalIgnoreCase);
-        
-        return ingredientStorage
-            .GetIngredientsByNames(allIngredientNames)
-            .ToDictionary(i => i.Name, StringComparer.OrdinalIgnoreCase);
-    }
-
-    private List<ShoppingListItem> GenerateShoppingList(List<Plan> plans, 
-        Dictionary<string, Recipe> recipeLookup, 
-        Dictionary<string, Ingredient> ingredientLookup)
-    {
-        return plans
-            .Where(plan => recipeLookup.ContainsKey(plan.RecipeName))
-            .SelectMany(plan => GetPlanIngredients(plan, recipeLookup[plan.RecipeName], ingredientLookup))
-            .GroupBy(x => x.IngredientName, StringComparer.OrdinalIgnoreCase)
-            .Select(group => new ShoppingListItem
-            {
-                IngredientName  = group.Key,
-                TotalQuantity = group.Sum(x => x.TotalQuantity),
-                Unit = group.First().Unit
-            })
-            .OrderBy(x => x.IngredientName )
-            .ToList();
-    }
-
-    private static IEnumerable<ShoppingListItem> GetPlanIngredients(
-        Plan plan, Recipe recipe, Dictionary<string, Ingredient> ingredientMap)
-    {
-        return recipe.Ingredients
-            .Where(ingredientMap.ContainsKey)
-            .Select(ingredientName => 
-            {
-                var ingredient = ingredientMap[ingredientName];
-                return new ShoppingListItem
-                {
-                    IngredientName = ingredientName,
-                    TotalQuantity = ingredient.Quantity * plan.ServingsMultiplier,
-                    Unit = ingredient.Unit.ToString()
-                };
-            });
-    }
-
-    private static void PrintShoppingList(List<ShoppingListItem> shoppingList)
+    private static void PrintShoppingList(List<Plan> plans, Dictionary<string, Recipe> recipes)
     {
         Console.WriteLine("Shopping List:");
-        
-        if (shoppingList.Count == 0) Console.WriteLine("No ingredients needed because you don't have any plans!.");
-        else shoppingList.ForEach(item => 
-                Console.WriteLine($"- \"{item.IngredientName }\": {item.TotalQuantity} {item.Unit}"));
-    }
-
-    private record ShoppingListItem
-    {
-        public string? IngredientName  { get; init; } = string.Empty;
-        public decimal TotalQuantity { get; init; }
-        public string Unit { get; init; } = string.Empty;
+    
+        var shoppingList = plans
+            .Where(plan => recipes.ContainsKey(plan.RecipeName))
+            .SelectMany(plan => recipes[plan.RecipeName].Ingredients
+                .Select(ingredient => new
+                {
+                    ingredient.Name,
+                    Quantity = ingredient.Quantity * plan.ServingsMultiplier,
+                    ingredient.Unit
+                }))
+            .GroupBy(x => (x.Name.ToLowerInvariant(), x.Unit))
+            .Select(group => new
+            {
+                Name = group.Key.Item1,
+                TotalQuantity = group.Sum(x => x.Quantity),
+                Unit = group.Key.Item2
+            })
+            .OrderBy(x => x.Name)
+            .ThenBy(x => x.Unit)
+            .ToList();
+    
+        if (shoppingList.Count == 0) 
+            Console.WriteLine("No ingredients needed because you don't have any plans!");
+        else 
+            shoppingList.ForEach(item => 
+                Console.WriteLine($"- \"{item.Name}\": {item.TotalQuantity} {item.Unit}"));
     }
 }

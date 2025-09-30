@@ -5,12 +5,13 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.Executors.RecipeExecutors;
 
-public class RecipeAddIngredientExecutor(IStorage<Recipe> recipeStorage, IStorage<Ingredient> ingredientStorage) 
+public class RecipeAddIngredientExecutor(IStorage<Recipe> recipeStorage) 
     : ICommandExecutor<CommandAddIngredient>
 {
     public ExecuteResult Execute(CommandAddIngredient command)
     {
         var recipe = recipeStorage.GetEntityByName(command.Name);
+        
         if (recipe == null)
         {
             Console.WriteLine($"Recipe with a name \"{command.Name}\" " +
@@ -18,14 +19,15 @@ public class RecipeAddIngredientExecutor(IStorage<Recipe> recipeStorage, IStorag
             return ExecuteResult.Continue;
         }
 
-        if (!ingredientStorage.ExistsByName(command.IngredientName))
+        if (recipe.Ingredients.Any(i => i.Name == command.IngredientName))
         {
             Console.WriteLine($"Ingredient with a name \"{command.IngredientName}\" " +
-                              $"was not found! No ingredients added.");
+                              $"has been already added to this great recipe! You cannot have ingredient with " +
+                              $"same names within one recipe, sweety:)!");
             return ExecuteResult.Continue;
         }
         
-        recipe.AddIngredient(command.IngredientName);
+        recipe.AddIngredient(new Ingredient(command.IngredientName, command.Quantity, command.Unit));
         Console.WriteLine($"Ingredient with a name \"{command.IngredientName}\" " +
                           $"was successfully added to this great recipe!");
         return ExecuteResult.Continue;

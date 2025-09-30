@@ -15,9 +15,9 @@ public static class CommandFactory
         var subfactories = new ICommandSubFactory[]
         {
             new StockCommandSubFactory(ingredientStorage),
-            new RecipeCommandSubFactory(recipeStorage, ingredientStorage),
+            new RecipeCommandSubFactory(recipeStorage),
             new PlanCommandSubFactory(planStorage),
-            new ShoppingCommandSubFactory(planStorage, recipeStorage, ingredientStorage),
+            new ShoppingCommandSubFactory(planStorage, recipeStorage),
             new HelpCommandSubFactory(),
             new ExitCommandSubFactory()
         };
