@@ -3,7 +3,7 @@ using RecipeManager.Entities;
 
 namespace RecipeManager.Actions;
 
-public class ScaleAction
+public class ScaleAction : IRecipeAction
 {
     public string Name => "scale";
     public string Description => "Preview scaled ingredient quantities";
