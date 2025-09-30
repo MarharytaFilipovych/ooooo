@@ -5,12 +5,11 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.CommandFactory;
 
-public class ShoppingCommandSubFactory(IStorage<Plan> planStorage, IRecipeStorage recipeStorage,
-    IIngredientStorage ingredientStorage) : ICommandSubFactory
+public class ShoppingCommandSubFactory(IStorage<Plan> planStorage, IRecipeStorage recipeStorage) : ICommandSubFactory
 {
     public void Create(Context context)
     {
         context.Register(new ShoppingExportDefinition(),
-            new ShoppingExportExecutor(planStorage, recipeStorage, ingredientStorage));
+            new ShoppingExportExecutor(planStorage, recipeStorage));
     }
 }
