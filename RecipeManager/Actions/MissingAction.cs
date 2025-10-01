@@ -13,17 +13,17 @@ public class MissingAction : IRecipeAction
         var missingIngredients = new List<string>();
         var insufficientIngredients = new Dictionary<string, string>();
 
-        foreach (var name in context.Recipe.Ingredients)
+        foreach (var i in context.Recipe.Ingredients)
         {
-            var inStock = context.IngredientStorage.GetEntityByName(name);
+            var inStock = context.IngredientStorage.GetEntityByName(i.Name);
 
             if (inStock == null)
             {
-                missingIngredients.Add(name);
+                missingIngredients.Add(i.Name);
             }
             else if (inStock.Quantity == 0)
             {
-                insufficientIngredients[name] = $"have 0 {inStock.Unit}";
+                insufficientIngredients[i.Name] = $"have 0 {inStock.Unit}";
             }
         }
 
@@ -50,7 +50,7 @@ public class MissingAction : IRecipeAction
                 result.AppendLine("\n Insufficient quantity:");
                 foreach (var i in insufficientIngredients)
                 {
-                    result.AppendLine($"  - {i}");
+                    result.AppendLine($"  - {i.Key}: {i.Value}");
                 }
             }
         }
