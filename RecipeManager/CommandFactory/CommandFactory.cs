@@ -18,6 +18,7 @@ public static class CommandFactory
             new RecipeCommandSubFactory(recipeStorage),
             new PlanCommandSubFactory(planStorage),
             new ShoppingCommandSubFactory(planStorage, recipeStorage),
+            new ActionCommandSubFactory(recipeStorage, ingredientStorage),
             new HelpCommandSubFactory(),
             new ExitCommandSubFactory()
         };
