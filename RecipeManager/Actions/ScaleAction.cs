@@ -21,22 +21,19 @@ public class ScaleAction : IRecipeAction
             return ActionResult.Bad("Multiplier must be a positive number!");
         }
 
+        if (multiplier == 0)
+        {
+            return ActionResult.Bad("Multiplier cannot be zero!");
+        }
+
         var result = new StringBuilder();
         result.AppendLine($"Recipe {context.Recipe.Name} x{multiplier}");
         result.AppendLine("\n Ingredients: ");
 
         foreach (var i in context.Recipe.Ingredients)
         {
-            var ingredient = context.IngredientStorage.GetEntityByName(i);
-            if (ingredient != null)
-            {
-                var quantity = ingredient.Quantity * multiplier;
-                result.AppendLine($"  - {i}: {quantity} {ingredient.Unit}");
-            }
-            else
-            {
-                result.AppendLine($"  - {i}: not in stock");
-            }
+            var quantity = i.Quantity * multiplier;
+            result.AppendLine($"  - {i}: {quantity} {i.Unit}");
         }
 
         return ActionResult.Good(result.ToString());
