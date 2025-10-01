@@ -50,9 +50,15 @@ public class Context
         }
         
         var commandName = group.ToString().ToLower();
-        if (args.Length > 1) commandName += " " + args[1].ToLower();
-        
 
+        var singleWordCommands = new[]
+            { CommandGroup.Options, CommandGroup.Action, CommandGroup.Help, CommandGroup.Exit };
+
+        if (!singleWordCommands.Contains(group) && args.Length > 1)
+        {
+            commandName += " " + args[1].ToLower();
+        }
+        
         if (!_commandDefinitions.TryGetValue(commandName, out var definition))
         {
             error = "Hmmm, we don't know such a command!!!";
