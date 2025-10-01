@@ -6,19 +6,20 @@ public static class CommandFactory
 {
     public static Context Create()
     {
-        var ingredientStorage = new InMemoryIngredientStorage();
-        var recipeStorage = new InMemoryRecipeStorage();
-        var planStorage = new InMemoryPlanStorage();
+        var userStorage = new InMemoryUserStorage();
+        var storageManager = new UserStorageManager();
         
         var context = new Context();
+        context.SetUserStorage(userStorage);
         
         var subfactories = new ICommandSubFactory[]
         {
-            new StockCommandSubFactory(ingredientStorage),
-            new RecipeCommandSubFactory(recipeStorage),
-            new PlanCommandSubFactory(planStorage),
-            new ShoppingCommandSubFactory(planStorage, recipeStorage),
-            new ActionCommandSubFactory(recipeStorage, ingredientStorage),
+            new LoginCommandSubFactory(userStorage, storageManager),
+            new StockCommandSubFactory(userStorage, storageManager),
+            new RecipeCommandSubFactory(userStorage, storageManager),
+            new PlanCommandSubFactory(userStorage, storageManager),
+            new ShoppingCommandSubFactory(userStorage, storageManager),
+            new ActionCommandSubFactory(userStorage, storageManager),
             new HelpCommandSubFactory(),
             new ExitCommandSubFactory()
         };

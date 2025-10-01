@@ -5,11 +5,19 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.Executors.PlanExecutors;
 
-public class PlanListExecutor(IStorage<Plan> storage) : ICommandExecutor<PlanListCommand>
+public class PlanListExecutor(IUserStorage userStorage, UserStorageManager storageManager) : ICommandExecutor<PlanListCommand>
 {
     public ExecuteResult Execute(PlanListCommand command)
     {
-        var plans = storage.GetAll();
+        var currentUser = userStorage.GetCurrentUser();
+        if (currentUser == null)
+        {
+            Console.WriteLine("You must login first!");
+            return ExecuteResult.Continue;
+        }
+
+        var planStorage = storageManager.GetPlanStorage(currentUser.Username);
+        var plans = planStorage.GetAll();
         
         if (plans.Count == 0)
         {

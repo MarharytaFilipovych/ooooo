@@ -4,14 +4,14 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.CommandFactory;
 
-public class RecipeCommandSubFactory(IRecipeStorage recipeStorage) : ICommandSubFactory
+public class RecipeCommandSubFactory(IUserStorage userStorage, UserStorageManager storageManager) : ICommandSubFactory
 {
     public void Create(Context context)
     {
-        context.Register(new RecipeAddDefinition(), new RecipeAddExecutor(recipeStorage));
-        context.Register(new RecipeAddIngredientDefinition(), new RecipeAddIngredientExecutor(recipeStorage));
-        context.Register(new RecipeAddStepsDefinition(), new RecipeAddStepsExecutor(recipeStorage));
-        context.Register(new RecipeInfoDefinition(), new RecipeInfoExecutor(recipeStorage));
-        context.Register(new RecipeListDefinition(), new RecipeListExecutor(recipeStorage));
+        context.Register(new RecipeAddDefinition(), new RecipeAddExecutor(userStorage, storageManager));
+        context.Register(new RecipeAddIngredientDefinition(), new RecipeAddIngredientExecutor(userStorage, storageManager));
+        context.Register(new RecipeAddStepsDefinition(), new RecipeAddStepsExecutor(userStorage, storageManager));
+        context.Register(new RecipeInfoDefinition(), new RecipeInfoExecutor(userStorage, storageManager));
+        context.Register(new RecipeListDefinition(), new RecipeListExecutor(userStorage, storageManager));
     }
 }

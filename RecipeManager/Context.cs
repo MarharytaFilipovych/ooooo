@@ -2,6 +2,7 @@ using System.Numerics;
 using RecipeManager.CommandDefinitions;
 using RecipeManager.Commands;
 using RecipeManager.Executors;
+using RecipeManager.Storage;
 
 namespace RecipeManager;
 
@@ -9,6 +10,7 @@ public class Context
 {
     private readonly Dictionary<string, ICommandDefinition> _commandDefinitions = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Type, ITypedExecutor> _executors = new();
+    private IUserStorage? _userStorage;
     
     private interface ITypedExecutor
     {
@@ -27,6 +29,11 @@ public class Context
     {
         _commandDefinitions[commandDefinition.Name] = commandDefinition;
         _executors[typeof(TCommand)] = new TypedExecutor<TCommand>(executor);
+    }
+
+    public void SetUserStorage(IUserStorage userStorage)
+    {
+        _userStorage = userStorage;
     }
 
     public List<ICommandDefinition> Commands => _commandDefinitions.Values.ToList();
@@ -48,11 +55,20 @@ public class Context
             error = $"Unrecognized command! You can use one of: {string.Join(", ", Enum.GetNames<CommandGroup>())}";
             return executeResult;
         }
+
+        if (group != CommandGroup.Login && group != CommandGroup.Help && group != CommandGroup.Exit)
+        {
+            if (_userStorage == null || !_userStorage.HasCurrentUser())
+            {
+                error = "You must login first! Use: login <username>";
+                return executeResult;
+            }
+        }
         
         var commandName = group.ToString().ToLower();
 
         var singleWordCommands = new[]
-            { CommandGroup.Options, CommandGroup.Action, CommandGroup.Help, CommandGroup.Exit };
+            { CommandGroup.Options, CommandGroup.Action, CommandGroup.Help, CommandGroup.Exit, CommandGroup.Login };
 
         if (!singleWordCommands.Contains(group) && args.Length > 1)
         {

@@ -6,7 +6,7 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.CommandFactory;
 
-public class ActionCommandSubFactory(IRecipeStorage recipeStorage, IIngredientStorage ingredientStorage)
+public class ActionCommandSubFactory(IUserStorage userStorage, UserStorageManager storageManager)
     : ICommandSubFactory
 {
     public void Create(Context context)
@@ -20,12 +20,12 @@ public class ActionCommandSubFactory(IRecipeStorage recipeStorage, IIngredientSt
         
         context.Register(
             new OptionDefinition(),
-            new OptionsExecutor(recipeStorage, actionRegistry)
+            new OptionsExecutor(userStorage, storageManager, actionRegistry)
             );
         
         context.Register(
             new ActionDefinition(),
-            new ActionsExecutor(recipeStorage, ingredientStorage, actionRegistry)
+            new ActionsExecutor(userStorage, storageManager, actionRegistry)
             );
     }
     
