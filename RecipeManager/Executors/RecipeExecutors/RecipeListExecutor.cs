@@ -5,11 +5,19 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.Executors.RecipeExecutors;
 
-public class RecipeListExecutor(IStorage<Recipe> storage) : ICommandExecutor<RecipeListCommand>
+public class RecipeListExecutor(IUserStorage userStorage, UserStorageManager storageManager) : ICommandExecutor<RecipeListCommand>
 {
     public ExecuteResult Execute(RecipeListCommand command)
     {
-        var recipes = storage.GetAll();
+        var currentUser = userStorage.GetCurrentUser();
+        if (currentUser == null)
+        {
+            Console.WriteLine("You must login first!");
+            return ExecuteResult.Continue;
+        }
+
+        var recipeStorage = storageManager.GetRecipeStorage(currentUser.Username);
+        var recipes = recipeStorage.GetAll();
         
         if (recipes.Count == 0)
         {

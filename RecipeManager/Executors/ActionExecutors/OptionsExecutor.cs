@@ -6,11 +6,19 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.Executors.ActionExecutors;
 
-public class OptionsExecutor(IRecipeStorage recipeStorage, IActionRegistry actionRegistry)
+public class OptionsExecutor(IUserStorage userStorage, UserStorageManager storageManager, IActionRegistry actionRegistry)
     : ICommandExecutor<OptionsCommand>
 {
     public ExecuteResult Execute(OptionsCommand command)
     {
+        var currentUser = userStorage.GetCurrentUser();
+        if (currentUser == null)
+        {
+            Console.WriteLine("You must login first!");
+            return ExecuteResult.Continue;
+        }
+
+        var recipeStorage = storageManager.GetRecipeStorage(currentUser.Username);
         var recipe = recipeStorage.GetEntityByName(command.Name);
 
         if (recipe == null)

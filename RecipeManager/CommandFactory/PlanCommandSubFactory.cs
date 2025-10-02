@@ -5,11 +5,11 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.CommandFactory;
 
-public class PlanCommandSubFactory(IStorage<Plan> planStorage) : ICommandSubFactory
+public class PlanCommandSubFactory(IUserStorage userStorage, UserStorageManager storageManager) : ICommandSubFactory
 {
     public void Create(Context context)
     {
-        context.Register(new PlanAddDefinition(), new PlanAddExecutor(planStorage));
-        context.Register(new PlanListDefinition(), new PlanListExecutor(planStorage));
+        context.Register(new PlanAddDefinition(), new PlanAddExecutor(userStorage, storageManager));
+        context.Register(new PlanListDefinition(), new PlanListExecutor(userStorage, storageManager));
     }
 }
