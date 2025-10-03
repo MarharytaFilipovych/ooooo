@@ -2,10 +2,12 @@ using RecipeManager.Commands;
 using RecipeManager.Commands.PlanCommands;
 using RecipeManager.Entities;
 using RecipeManager.Storage;
+using RecipeManager.Utils;
 
 namespace RecipeManager.Executors.PlanExecutors;
 
-public class PlanAddExecutor(IUserStorage userStorage, UserStorageManager storageManager) : ICommandExecutor<PlanAddCommand>
+public class PlanAddExecutor(IUserStorage userStorage, UserStorageManager storageManager, IPlanValidator planValidator)
+    : ICommandExecutor<PlanAddCommand>
 {
     public ExecuteResult Execute(PlanAddCommand command)
     {
@@ -13,6 +15,13 @@ public class PlanAddExecutor(IUserStorage userStorage, UserStorageManager storag
         if (currentUser == null)
         {
             Console.WriteLine("You must login first!");
+            return ExecuteResult.Continue;
+        }
+        
+        var validationResult = planValidator.CanAddPlan(currentUser.Username);
+        if (!validationResult.IsValid)
+        {
+            Console.WriteLine(validationResult.ErrorMessage);
             return ExecuteResult.Continue;
         }
 

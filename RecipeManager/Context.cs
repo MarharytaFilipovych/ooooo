@@ -68,7 +68,7 @@ public class Context
         var commandName = group.ToString().ToLower();
 
         var singleWordCommands = new[]
-            { CommandGroup.Options, CommandGroup.Action, CommandGroup.Help, CommandGroup.Exit, CommandGroup.Login };
+            { CommandGroup.Options, CommandGroup.Action, CommandGroup.Help, CommandGroup.Exit, CommandGroup.Login, CommandGroup.ChangePlan };
 
         if (!singleWordCommands.Contains(group) && args.Length > 1)
         {
