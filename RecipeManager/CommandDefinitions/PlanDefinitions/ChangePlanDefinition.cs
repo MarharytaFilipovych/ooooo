@@ -6,8 +6,8 @@ namespace RecipeManager.CommandDefinitions.PlanDefinitions;
 
 public class ChangePlanDefinition : ICommandDefinition
 {
-    public string Name => "changePlan";
-    public string Description => "changePlan <plan_name>";
+    public string Name => "change_plan";
+    public string Description => "change_plan <plan_name>";
 
     public bool TryParse(string[] args, out ICommand? command, out string? error)
     {
