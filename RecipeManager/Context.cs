@@ -50,7 +50,7 @@ public class Context
             return executeResult;
         }
         
-        if (!Enum.TryParse(args[0], ignoreCase: true, out CommandGroup group))
+        if (!Enum.TryParse(args[0].Replace("_", ""), ignoreCase: true, out CommandGroup group))
         {
             error = $"Unrecognized command! You can use one of: {string.Join(", ", Enum.GetNames<CommandGroup>())}";
             return executeResult;
@@ -68,7 +68,7 @@ public class Context
         var commandName = group.ToString().ToLower();
 
         var singleWordCommands = new[]
-            { CommandGroup.Options, CommandGroup.Action, CommandGroup.Help, CommandGroup.Exit, CommandGroup.Login };
+            { CommandGroup.Options, CommandGroup.Action, CommandGroup.Help, CommandGroup.Exit, CommandGroup.Login, CommandGroup.ChangePlan };
 
         if (!singleWordCommands.Contains(group) && args.Length > 1)
         {

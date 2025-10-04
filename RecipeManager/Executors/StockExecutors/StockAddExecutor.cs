@@ -2,10 +2,11 @@ using RecipeManager.Commands;
 using RecipeManager.Commands.StockCommands;
 using RecipeManager.Entities;
 using RecipeManager.Storage;
+using RecipeManager.Utils;
 
 namespace RecipeManager.Executors.StockExecutors;
 
-public class StockAddExecutor(IUserStorage userStorage, UserStorageManager storageManager) :
+public class StockAddExecutor(IUserStorage userStorage, UserStorageManager storageManager, IPlanValidator planValidator) :
     ICommandExecutor<StockAddCommand>
 {
     public ExecuteResult Execute(StockAddCommand command)
@@ -14,6 +15,13 @@ public class StockAddExecutor(IUserStorage userStorage, UserStorageManager stora
         if (currentUser == null)
         {
             Console.WriteLine("You must login first!");
+            return ExecuteResult.Continue;
+        }
+        
+        var validationResult = planValidator.CanAddPantryItem(currentUser.Username);
+        if (!validationResult.IsValid)
+        {
+            Console.WriteLine(validationResult.ErrorMessage);
             return ExecuteResult.Continue;
         }
 

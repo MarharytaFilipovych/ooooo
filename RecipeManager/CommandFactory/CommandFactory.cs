@@ -1,4 +1,5 @@
 using RecipeManager.Storage;
+using RecipeManager.Utils;
 
 namespace RecipeManager.CommandFactory;
 
@@ -8,16 +9,19 @@ public static class CommandFactory
     {
         var userStorage = new InMemoryUserStorage();
         var storageManager = new UserStorageManager();
+        var subscriptionStorage = new InMemorySubscriptionStorage();
+        
+        var planValidator = new PlanValidator(userStorage, subscriptionStorage, storageManager);
         
         var context = new Context();
         context.SetUserStorage(userStorage);
         
         var subfactories = new ICommandSubFactory[]
         {
-            new LoginCommandSubFactory(userStorage, storageManager),
-            new StockCommandSubFactory(userStorage, storageManager),
-            new RecipeCommandSubFactory(userStorage, storageManager),
-            new PlanCommandSubFactory(userStorage, storageManager),
+            new LoginCommandSubFactory(userStorage, storageManager, subscriptionStorage),
+            new StockCommandSubFactory(userStorage, storageManager, planValidator),
+            new RecipeCommandSubFactory(userStorage, storageManager, planValidator),
+            new PlanCommandSubFactory(userStorage, storageManager, planValidator, subscriptionStorage),
             new ShoppingCommandSubFactory(userStorage, storageManager),
             new ActionCommandSubFactory(userStorage, storageManager),
             new HelpCommandSubFactory(),
