@@ -61,7 +61,7 @@ public class Context
         return executeResult;
     }
 
-    private bool TryValidateArgs(string[] args, out string? error)
+    private static bool TryValidateArgs(string[] args, out string? error)
     {
         if (args.Length == 0)
         {
@@ -73,7 +73,7 @@ public class Context
         return true;
     }
     
-    private bool TryParseCommandGroup(string arg, out CommandGroup group, out string? error)
+    private static bool TryParseCommandGroup(string arg, out CommandGroup group, out string? error)
     {
         if (!Enum.TryParse(arg.Replace("_", ""), ignoreCase: true, out group))
         {
@@ -100,22 +100,20 @@ public class Context
     
     private string BuildCommandName(CommandGroup group, string[] args)
     {
-        var commandName = group.ToString().ToLower();
+        var commandName = string.Concat(
+            group.ToString().Select((c, i) => 
+                i > 0 && char.IsUpper(c) ? "_" + char.ToLower(c) : char.ToLower(c).ToString()
+            )
+        );
 
         var singleWordCommands = new[]
         {
-            CommandGroup.Options,
-            CommandGroup.Action,
-            CommandGroup.Help,
-            CommandGroup.Exit,
-            CommandGroup.Login,
-            CommandGroup.ChangePlan
+            CommandGroup.Options, CommandGroup.Action,
+            CommandGroup.Help, CommandGroup.Exit,
+            CommandGroup.Login, CommandGroup.ChangePlan
         };
 
-        if (!singleWordCommands.Contains(group) && args.Length > 1)
-        {
-            commandName += " " + args[1].ToLower();
-        }
+        if (!singleWordCommands.Contains(group) && args.Length > 1) commandName += " " + args[1].ToLower();
 
         return commandName;
     }

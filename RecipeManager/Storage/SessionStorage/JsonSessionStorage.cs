@@ -8,8 +8,7 @@ namespace RecipeManager.Storage.SessionStorage;
 
 public class JsonSessionStorage : ISessionStorage
 {
-    private const string DirectoryName = "OurBeautifulUsers";
-    
+    private static readonly string DirectoryName = Path.Combine(GetProjectRoot(), "OurBeautifulUsers");    
     private readonly IIngredientStorage _ingredientStorage;
     private readonly IRecipeStorage _recipeStorage;
     private readonly IStorage<Plan> _planStorage;
@@ -128,5 +127,19 @@ public class JsonSessionStorage : ISessionStorage
     {
         var cleanedUsername = string.Join("_", username.Split(Path.GetInvalidFileNameChars()));
         return Path.Combine(DirectoryName, $"{cleanedUsername}.json");
+    }
+    
+    private static string GetProjectRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        var projectName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+        var csprojFile = $"{projectName}.csproj";
+
+        while (directory != null && !File.Exists(Path.Combine(directory.FullName, csprojFile)))
+        {
+            directory = directory.Parent;
+        }
+
+        return directory?.FullName ?? AppContext.BaseDirectory;
     }
 }

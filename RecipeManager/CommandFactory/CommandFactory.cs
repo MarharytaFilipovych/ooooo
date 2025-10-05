@@ -29,9 +29,10 @@ public static class CommandFactory
             new PlanCommandSubFactory(sessionStorage, planStorage, planValidator),
             new ShoppingCommandSubFactory(recipeStorage, planStorage),
             new ActionCommandSubFactory(recipeStorage, ingredientStorage),
-            new HelpCommandSubFactory(),
             new ExitCommandSubFactory(sessionStorage),
-            new ChangePlanCommandSubFactory(sessionStorage, planValidator)
+            new ChangePlanCommandSubFactory(sessionStorage, planValidator),
+            new HelpCommandSubFactory()
+            
         };
         
         foreach (var subfactory in subfactories)
