@@ -1,16 +1,16 @@
-using System.Numerics;
 using RecipeManager.CommandDefinitions;
 using RecipeManager.Commands;
 using RecipeManager.Executors;
-using RecipeManager.Storage;
+using RecipeManager.Storage.SessionStorage;
 
 namespace RecipeManager;
 
 public class Context
 {
-    private readonly Dictionary<string, ICommandDefinition> _commandDefinitions = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, ICommandDefinition> _commandDefinitions =
+        new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Type, ITypedExecutor> _executors = new();
-    private IUserStorage? _userStorage;
+    private ISessionStorage? _sessionStorage;
     
     private interface ITypedExecutor
     {
@@ -31,9 +31,9 @@ public class Context
         _executors[typeof(TCommand)] = new TypedExecutor<TCommand>(executor);
     }
 
-    public void SetUserStorage(IUserStorage userStorage)
+    public void SetUserStorage(ISessionStorage sessionStorage)
     {
-        _userStorage = userStorage;
+        _sessionStorage = sessionStorage;
     }
 
     public List<ICommandDefinition> Commands => _commandDefinitions.Values.ToList();
@@ -44,56 +44,95 @@ public class Context
         error = null;
         var executeResult = ExecuteResult.Error;
 
-        if (args.Length == 0 )
+        if (!TryValidateArgs(args, out error) || 
+            !TryParseCommandGroup(args[0], out var group, out error) || 
+            !ValidateUserLoggedIn(group, out error)) return executeResult;
+
+        var commandName = BuildCommandName(group, args);
+
+        if (!TryGetCommandDefinition(commandName, out var definition, out error) 
+            || !definition!.TryParse(args, out var command, out error)) return executeResult;
+
+        var commandType = command!.GetType();
+        if (_executors.TryGetValue(commandType, out var executor))
+            return executor.Execute(command);
+
+        error = $"There is no any registered executor for this command {commandType.Name}";
+        return executeResult;
+    }
+
+    private bool TryValidateArgs(string[] args, out string? error)
+    {
+        if (args.Length == 0)
         {
             error = "Where is your input???";
-            return executeResult;
-        }
-        
-        if (!Enum.TryParse(args[0].Replace("_", ""), ignoreCase: true, out CommandGroup group))
-        {
-            error = $"Unrecognized command! You can use one of: {string.Join(", ", Enum.GetNames<CommandGroup>())}";
-            return executeResult;
+            return false;
         }
 
-        if (group != CommandGroup.Login && group != CommandGroup.Help && group != CommandGroup.Exit)
+        error = null;
+        return true;
+    }
+    
+    private bool TryParseCommandGroup(string arg, out CommandGroup group, out string? error)
+    {
+        if (!Enum.TryParse(arg.Replace("_", ""), ignoreCase: true, out group))
         {
-            if (_userStorage == null || !_userStorage.HasCurrentUser())
-            {
-                error = "You must login first! Use: login <username>";
-                return executeResult;
-            }
+            error = $"Unrecognized command! You can use one of: {string.Join(", ", Enum.GetNames<CommandGroup>())}";
+            return false;
         }
-        
+
+        error = null;
+        return true;
+    }
+    
+    private bool ValidateUserLoggedIn(CommandGroup group, out string? error)
+    {
+        if (CommandRequiresUserToBeLoggedIn(group) &&
+            (_sessionStorage == null || !_sessionStorage.CurrentUserIsLoaded()))
+        {
+            error = "You must login first! Use: login <username> or get out!";
+            return false;
+        }
+
+        error = null;
+        return true;
+    }
+    
+    private string BuildCommandName(CommandGroup group, string[] args)
+    {
         var commandName = group.ToString().ToLower();
 
         var singleWordCommands = new[]
-            { CommandGroup.Options, CommandGroup.Action, CommandGroup.Help, CommandGroup.Exit, CommandGroup.Login, CommandGroup.ChangePlan };
+        {
+            CommandGroup.Options,
+            CommandGroup.Action,
+            CommandGroup.Help,
+            CommandGroup.Exit,
+            CommandGroup.Login,
+            CommandGroup.ChangePlan
+        };
 
         if (!singleWordCommands.Contains(group) && args.Length > 1)
         {
             commandName += " " + args[1].ToLower();
         }
-        
-        if (!_commandDefinitions.TryGetValue(commandName, out var definition))
+
+        return commandName;
+    }
+
+    private bool TryGetCommandDefinition(string commandName, out ICommandDefinition? definition, out string? error)
+    {
+        if (!_commandDefinitions.TryGetValue(commandName, out definition))
         {
             error = "Hmmm, we don't know such a command!!!";
-            return executeResult;
+            return false;
         }
 
-
-        if (!definition.TryParse(args, out var command, out var parsingError))
-        {
-            error = parsingError;
-            return executeResult;
-        }
-
-
-        var commandType = command!.GetType();
-
-        if (_executors.TryGetValue(commandType, out var executor)) return executor.Execute(command);
-        error = $"There is no any register executor for this command {commandType.Name}";
-        return executeResult;
-
+        error = null;
+        return true;
     }
+
+    private bool CommandRequiresUserToBeLoggedIn(CommandGroup group) =>
+        group != CommandGroup.Login && group != CommandGroup.Help && group != CommandGroup.Exit;
+
 }

@@ -1,4 +1,3 @@
-using RecipeManager.CommandDefinitions;
 using RecipeManager.CommandDefinitions.HelpDefinitions;
 using RecipeManager.Executors.HelpExecutors;
 

@@ -2,30 +2,29 @@ using RecipeManager.Commands;
 using RecipeManager.Commands.RecipeCommands;
 using RecipeManager.Entities;
 using RecipeManager.Storage;
+using RecipeManager.Storage.SessionStorage;
 using RecipeManager.Utils;
 
 namespace RecipeManager.Executors.RecipeExecutors;
 
-public class RecipeAddExecutor(IUserStorage userStorage, UserStorageManager storageManager, IPlanValidator planValidator) :
-    ICommandExecutor<CommandAdd>
+public class RecipeAddExecutor(ISessionStorage sessionStorage, IStorage<Recipe> recipeStorage, 
+    IPlanValidator planValidator) : ICommandExecutor<CommandAdd>
 {
     public ExecuteResult Execute(CommandAdd command)
     {
-        var currentUser = userStorage.GetCurrentUser();
-        if (currentUser == null)
+        if (!sessionStorage.TryGetCurrentUser(out var currentUser))
         {
             Console.WriteLine("You must login first!");
             return ExecuteResult.Continue;
         }
 
-        var validationResult = planValidator.CanAddRecipe(currentUser.Username);
+        var validationResult = planValidator.CanAddRecipe(currentUser!.Subscription);
         if (!validationResult.IsValid)
         {
             Console.WriteLine(validationResult.ErrorMessage);
             return ExecuteResult.Continue;
         }
         
-        var recipeStorage = storageManager.GetRecipeStorage(currentUser.Username);
         var recipe = new Recipe(command.Name);
         
         Console.WriteLine(recipeStorage.Add(recipe)

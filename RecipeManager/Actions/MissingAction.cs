@@ -45,13 +45,12 @@ public class MissingAction : IRecipeAction
                 }
             }
 
-            if (insufficientIngredients.Any())
+            if (!insufficientIngredients.Any()) return ActionResult.Good(result.ToString());
+            
+            result.AppendLine("\n Insufficient quantity:");
+            foreach (var i in insufficientIngredients)
             {
-                result.AppendLine("\n Insufficient quantity:");
-                foreach (var i in insufficientIngredients)
-                {
-                    result.AppendLine($"  - {i.Key}: {i.Value}");
-                }
+                result.AppendLine($"  - {i.Key}: {i.Value}");
             }
         }
 

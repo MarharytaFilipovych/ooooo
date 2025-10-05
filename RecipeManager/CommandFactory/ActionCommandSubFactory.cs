@@ -2,11 +2,12 @@ using RecipeManager.ActionRegistry;
 using RecipeManager.Actions;
 using RecipeManager.CommandDefinitions.ActionDefinitions;
 using RecipeManager.Executors.ActionExecutors;
-using RecipeManager.Storage;
+using RecipeManager.Storage.IngredientStorage;
+using RecipeManager.Storage.RecipeStorage;
 
 namespace RecipeManager.CommandFactory;
 
-public class ActionCommandSubFactory(IUserStorage userStorage, UserStorageManager storageManager)
+public class ActionCommandSubFactory(IRecipeStorage recipeStorage, IIngredientStorage ingredientStorage)
     : ICommandSubFactory
 {
     public void Create(Context context)
@@ -20,13 +21,10 @@ public class ActionCommandSubFactory(IUserStorage userStorage, UserStorageManage
         
         context.Register(
             new OptionDefinition(),
-            new OptionsExecutor(userStorage, storageManager, actionRegistry)
-            );
+            new OptionsExecutor(recipeStorage, actionRegistry));
         
         context.Register(
             new ActionDefinition(),
-            new ActionsExecutor(userStorage, storageManager, actionRegistry)
-            );
+            new ActionsExecutor(recipeStorage, ingredientStorage, actionRegistry));
     }
-    
 }

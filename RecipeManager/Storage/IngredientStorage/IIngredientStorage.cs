@@ -1,6 +1,6 @@
 using RecipeManager.Entities;
 
-namespace RecipeManager.Storage;
+namespace RecipeManager.Storage.IngredientStorage;
 
 public interface IIngredientStorage : IStorage<Ingredient>
 {

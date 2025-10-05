@@ -1,37 +1,29 @@
-using RecipeManager.Factories;
-using RecipeManager.Commands.PlanCommands;
-using RecipeManager.Storage;
-using RecipeManager.Utils;
 using RecipeManager.Commands;
+using RecipeManager.Commands.ChangePlanCommands;
+using RecipeManager.Factories;
+using RecipeManager.Storage.SessionStorage;
+using RecipeManager.Utils;
 
-namespace RecipeManager.Executors.PlanExecutors;
+namespace RecipeManager.Executors.ChangePlanExecutors;
 
-public class ChangePlanExecutor(IUserStorage userStorage, ISubscriptionStorage subscriptionStorage,
+public class ChangePlanExecutor(ISessionStorage sessionStorage,
     IPlanValidator planValidator) : ICommandExecutor<ChangePlanCommand>
 {
     public ExecuteResult Execute(ChangePlanCommand command)
     {
-        var currentUser = userStorage.GetCurrentUser();
-        if (currentUser == null)
+        if (!sessionStorage.TryGetCurrentUser(out var currentUser))
         {
             Console.WriteLine("You must login first!");
             return ExecuteResult.Continue;
         }
-
-        var subscription = subscriptionStorage.GetSubscription(currentUser.Username);
-        if (subscription == null)
-        {
-            Console.WriteLine("Subscription not found. What the hell?");
-            return ExecuteResult.Continue;
-        }
-
-        if (subscription.Plan.Type == command.NewPlanType)
+        
+        if (currentUser!.Subscription.Type == command.NewPlanType)
         {
             Console.WriteLine("You are already on this plan!");
             return ExecuteResult.Continue;
         }
 
-        var validationResult = planValidator.CanChangePlan(currentUser.Username, command.NewPlanType);
+        var validationResult = planValidator.CanChangePlan(command.NewPlanType);
         if (!validationResult.IsValid)
         {
             Console.WriteLine(validationResult.ErrorMessage);
@@ -39,8 +31,7 @@ public class ChangePlanExecutor(IUserStorage userStorage, ISubscriptionStorage s
         }
 
         var newPlan = SubscriptionPlanFactory.CreatePlan(command.NewPlanType);
-        subscription.ChangePlan(newPlan);
-        subscriptionStorage.UpdateSubscription(subscription);
+        currentUser.Subscription = newPlan;
         Console.WriteLine($"Successfully changed to {command.NewPlanType} plan!");
         Console.WriteLine($"Now you have available: Pantry - {newPlan.MaxPantryItems}, \n" +
                           $"Recipes - {newPlan.MaxRecipes}, \nEntries - {newPlan.MaxPossibleEntries}.");

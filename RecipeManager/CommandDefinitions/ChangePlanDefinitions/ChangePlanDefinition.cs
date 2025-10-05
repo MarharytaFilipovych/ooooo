@@ -1,8 +1,9 @@
 using RecipeManager.Commands;
+using RecipeManager.Commands.ChangePlanCommands;
 using RecipeManager.Commands.PlanCommands;
 using RecipeManager.Entities;
 
-namespace RecipeManager.CommandDefinitions.PlanDefinitions;
+namespace RecipeManager.CommandDefinitions.ChangePlanDefinitions;
 
 public class ChangePlanDefinition : ICommandDefinition
 {

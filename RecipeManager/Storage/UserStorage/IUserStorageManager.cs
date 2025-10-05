@@ -1,6 +1,8 @@
 using RecipeManager.Entities;
+using RecipeManager.Storage.IngredientStorage;
+using RecipeManager.Storage.RecipeStorage;
 
-namespace RecipeManager.Storage;
+namespace RecipeManager.Storage.UserStorage;
 
 public interface IUserStorageManager
 {

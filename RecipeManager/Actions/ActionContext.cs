@@ -1,21 +1,17 @@
 using RecipeManager.Entities;
-using RecipeManager.Storage;
+using RecipeManager.Storage.IngredientStorage;
+using RecipeManager.Storage.RecipeStorage;
 
 namespace RecipeManager.Actions;
 
-public class ActionContext
+public class ActionContext(
+    Recipe recipe,
+    IIngredientStorage ingredientStorage,
+    IRecipeStorage recipeStorage,
+    string? parameter = null)
 {
-    public Recipe Recipe { get; }
-    public string? Parameter { get; }
-    public IIngredientStorage IngredientStorage { get; }
-    public IRecipeStorage RecipeStorage { get; }
-
-    public ActionContext(Recipe recipe, IIngredientStorage ingredientStorage, IRecipeStorage recipeStorage,
-        string? parameter = null)
-    {
-        Recipe = recipe;
-        IngredientStorage = ingredientStorage;
-        RecipeStorage = recipeStorage;
-        Parameter = parameter;
-    }
+    public Recipe Recipe { get; } = recipe;
+    public string? Parameter { get; } = parameter;
+    public IIngredientStorage IngredientStorage { get; } = ingredientStorage;
+    public IRecipeStorage RecipeStorage { get; } = recipeStorage;
 }

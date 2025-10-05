@@ -1,6 +1,6 @@
 using RecipeManager.Entities;
 
-namespace RecipeManager.Storage;
+namespace RecipeManager.Storage.IngredientStorage;
 
 public class InMemoryIngredientStorage : IIngredientStorage
 {
@@ -28,6 +28,19 @@ public class InMemoryIngredientStorage : IIngredientStorage
     public List<Ingredient> GetAll() => _ingredients.Values.ToList();
     
     public bool ExistsByName(string name) => _ingredients.ContainsKey(name);
+    
+    public void AddAll(IEnumerable<Ingredient> ingredients)
+    {
+        foreach (var ingredient in ingredients)
+        {
+            _ingredients.TryAdd(ingredient.Name, ingredient);
+        }
+    }
+
+    public void RemoveAll()
+    {
+        _ingredients.Clear();
+    }
 
     public bool Consume(Ingredient ingredient)
     {

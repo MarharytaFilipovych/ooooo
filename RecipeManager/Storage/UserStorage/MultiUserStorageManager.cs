@@ -1,8 +1,10 @@
 using RecipeManager.Entities;
+using RecipeManager.Storage.IngredientStorage;
+using RecipeManager.Storage.RecipeStorage;
 
-namespace RecipeManager.Storage;
+namespace RecipeManager.Storage.UserStorage;
 
-public class UserStorageManager(
+public class MultiUserStorageManager(
     Func<IIngredientStorage> ingredientStorageFactory,
     Func<IRecipeStorage> recipeStorageFactory,
     Func<IStorage<Plan>> planStorageFactory)

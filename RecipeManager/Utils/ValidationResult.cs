@@ -15,9 +15,8 @@ public class ValidationResult
 
     public static ValidationResult Failure(string errorMessage)
     {
-        if (string.IsNullOrWhiteSpace(errorMessage)) 
-            throw new ArgumentException("Error message cannot be empty");
-
-        return new ValidationResult(false, errorMessage);
+        return string.IsNullOrWhiteSpace(errorMessage) 
+            ? throw new ArgumentException("Error message cannot be empty")
+            : new ValidationResult(false, errorMessage);
     }
 }
