@@ -8,7 +8,11 @@ public static class CommandFactory
     public static Context Create()
     {
         var userStorage = new InMemoryUserStorage();
-        var storageManager = new UserStorageManager();
+        var storageManager = new UserStorageManager(
+            () => new InMemoryIngredientStorage(), 
+            () => new InMemoryRecipeStorage(),     
+            () => new InMemoryPlanStorage()      
+        );       
         var subscriptionStorage = new InMemorySubscriptionStorage();
         
         var planValidator = new PlanValidator(userStorage, subscriptionStorage, storageManager);
