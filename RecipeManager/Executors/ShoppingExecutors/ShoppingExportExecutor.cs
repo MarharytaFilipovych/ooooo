@@ -2,22 +2,15 @@ using RecipeManager.Commands;
 using RecipeManager.Commands.ShoppingCommands;
 using RecipeManager.Entities;
 using RecipeManager.Storage;
+using RecipeManager.Storage.RecipeStorage;
 
 namespace RecipeManager.Executors.ShoppingExecutors;
 
-public class ShoppingExportExecutor(IUserStorage userStorage, UserStorageManager storageManager)
-    : ICommandExecutor<ShoppingExportCommand>
+public class ShoppingExportExecutor(IRecipeStorage recipeStorage, IStorage<Plan> planStorage) : 
+    ICommandExecutor<ShoppingExportCommand>
 {
     public ExecuteResult Execute(ShoppingExportCommand command)
     {
-        var currentUser = userStorage.GetCurrentUser();
-        if (currentUser == null)
-        {
-            Console.WriteLine("You must login first!");
-            return ExecuteResult.Continue;
-        }
-
-        var planStorage = storageManager.GetPlanStorage(currentUser.Username);
         var plans = planStorage.GetAll();
         var recipeMap = GetRecipeMap(plans);
         
@@ -28,8 +21,6 @@ public class ShoppingExportExecutor(IUserStorage userStorage, UserStorageManager
 
     private Dictionary<string, Recipe> GetRecipeMap(List<Plan> plans)
     {
-        var currentUser = userStorage.GetCurrentUser();
-        var recipeStorage = storageManager.GetRecipeStorage(currentUser.Username);
         var recipeNames = plans.Select(plan => plan.RecipeName);
         var recipes = recipeStorage.GetRecipesByNames(recipeNames);
         return recipes.ToDictionary(r => r.Name, StringComparer.OrdinalIgnoreCase);

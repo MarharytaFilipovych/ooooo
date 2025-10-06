@@ -1,28 +1,19 @@
-using RecipeManager.Factories;
 using RecipeManager.Commands;
 using RecipeManager.Commands.LoginCommands;
-using RecipeManager.Storage;
+using RecipeManager.Storage.SessionStorage;
 
 namespace RecipeManager.Executors.LoginExecutors;
 
-public class LoginExecutor(IUserStorage userStorage, UserStorageManager storageManager, ISubscriptionStorage subscriptionStorage) : ICommandExecutor<LoginCommand>
+public class LoginExecutor(ISessionStorage sessionStorage) : ICommandExecutor<LoginCommand>
 {
     public ExecuteResult Execute(LoginCommand command)
     {
-        var user = userStorage.GetOrCreateUser(command.Username);
-        userStorage.SetCurrentUser(user);
+        if (sessionStorage.CurrentUserIsLoaded()) sessionStorage.Save();
 
-        if (!subscriptionStorage.HasSubscription(user.Username))
-        {
-            var defaultPlan = SubscriptionPlanFactory.CreateBasicPlan();
-            subscriptionStorage.CreateSubscription(user.Username, defaultPlan);
-            Console.WriteLine($"Logged in as {user.Username} with {defaultPlan.Type} plan");
-        }
-        else
-        {
-            var subscription = subscriptionStorage.GetSubscription(user.Username);
-            Console.WriteLine($"Logged in as {user.Username} with {subscription?.Plan.Type} plan");
-        }
+        Console.WriteLine(sessionStorage.TryLoad(command.Username, out var user, out var error)
+            ? $"Logged in as {user!.Username} with {user.Subscription.Type} plan"
+            : error);
+
         return ExecuteResult.Continue;
     }
 }

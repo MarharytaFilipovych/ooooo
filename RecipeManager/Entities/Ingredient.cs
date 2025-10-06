@@ -2,10 +2,12 @@ namespace RecipeManager.Entities;
 
 public class Ingredient
 {
-    public string Name { get; }
+    public string Name { get; set; } = String.Empty;
     public decimal Quantity { get; set; }
-    public Unit Unit { get;  }
+    public Unit Unit { get; set; }
     
+    public Ingredient() { }
+
     public Ingredient(string name, decimal quantity, Unit unit)
     {
         if (string.IsNullOrWhiteSpace(name))

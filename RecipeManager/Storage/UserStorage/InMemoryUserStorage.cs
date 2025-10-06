@@ -1,6 +1,6 @@
 using RecipeManager.Entities;
 
-namespace RecipeManager.Storage;
+namespace RecipeManager.Storage.UserStorage;
 
 public class InMemoryUserStorage : IUserStorage
 {

@@ -2,10 +2,12 @@ namespace RecipeManager.Entities;
 
 public class Plan
 {
-    public string Name { get; }
-    public string RecipeName { get;  }
-    public DateTime Date { get;  }
-    public decimal ServingsMultiplier { get; }
+    public string Name { get; set; } = string.Empty;
+    public string RecipeName { get; set; } = string.Empty;
+    public DateTime Date { get; set; }
+    public decimal ServingsMultiplier { get; set; } = 1;
+    
+    public Plan() { }
 
     public Plan(string name, string recipeName, DateTime date, decimal? servingsMultiplier)
     { 

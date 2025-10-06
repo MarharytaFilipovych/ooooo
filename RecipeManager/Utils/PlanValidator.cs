@@ -1,78 +1,60 @@
 using RecipeManager.Factories;
 using RecipeManager.Entities;
 using RecipeManager.Storage;
+using RecipeManager.Storage.IngredientStorage;
+using RecipeManager.Storage.RecipeStorage;
 
 namespace RecipeManager.Utils;
 
-public class PlanValidator(
-    IUserStorage userStorage,
-    ISubscriptionStorage subscriptionStorage,
-    UserStorageManager storageManager) : IPlanValidator
+public class PlanValidator(IIngredientStorage  ingredientStorage, IStorage<Plan> planStorage, 
+    IRecipeStorage recipeStorage) : IPlanValidator
 {
-    public ValidationResult CanAddPantryItem(string username)
+    public ValidationResult CanAddPantryItem(SubscriptionPlan subscriptionPlan)
     {
-        var subscription = subscriptionStorage.GetSubscription(username);
-        if (subscription == null)
-            return ValidationResult.Failure("User subscription not found");
 
-        var ingredientStorage = storageManager.GetIngredientStorage(username);
         var currentCount = ingredientStorage.GetTotalQuantity();
 
-        if (currentCount >= subscription.Plan.MaxPantryItems)
+        if (currentCount >= subscriptionPlan.MaxPantryItems)
         {
             return ValidationResult.Failure(
-                $"Cannot add pantry item. Your {subscription.Plan.Type} plan allows maximum " +
-                $"{subscription.Plan.MaxPantryItems} items. Current: {currentCount}");
+                $"Cannot add pantry item. Your {subscriptionPlan.Type} plan allows maximum " +
+                $"{subscriptionPlan.MaxPantryItems} items. Current: {currentCount}");
         }
 
         return ValidationResult.Success();
     }
 
-    public ValidationResult CanAddRecipe(string username)
+    public ValidationResult CanAddRecipe(SubscriptionPlan subscriptionPlan)
     {
-        var subscription = subscriptionStorage.GetSubscription(username);
-        if (subscription == null)
-            return ValidationResult.Failure("User subscription not found");
-
-        var recipeStorage = storageManager.GetRecipeStorage(username);
         var currentCount = recipeStorage.GetTotalQuantity();
 
-        if (currentCount >= subscription.Plan.MaxRecipes)
+        if (currentCount >= subscriptionPlan.MaxRecipes)
         {
             return ValidationResult.Failure(
-                $"Cannot add recipe. Your {subscription.Plan.Type} plan allows maximum " +
-                $"{subscription.Plan.MaxRecipes} recipes. Current: {currentCount}");
+                $"Cannot add recipe. Your {subscriptionPlan.Type} plan allows maximum " +
+                $"{subscriptionPlan.MaxRecipes} recipes. Current: {currentCount}");
         }
 
         return ValidationResult.Success();
     }
 
-    public ValidationResult CanAddPlan(string username)
+    public ValidationResult CanAddPlan(SubscriptionPlan subscriptionPlan)
     {
-        var subscription = subscriptionStorage.GetSubscription(username);
-        if (subscription == null)
-            return ValidationResult.Failure("User subscription not found");
-
-        var planStorage = storageManager.GetPlanStorage(username);
         var currentCount = planStorage.GetTotalQuantity();
 
-        if (currentCount >= subscription.Plan.MaxPossibleEntries)
+        if (currentCount >= subscriptionPlan.MaxPossibleEntries)
         {
             return ValidationResult.Failure(
-                $"Cannot add meal plan. Your {subscription.Plan.Type} plan allows maximum " +
-                $"{subscription.Plan.MaxPossibleEntries} planned entries. Current: {currentCount}");
+                $"Cannot add meal plan. Your {subscriptionPlan.Type} plan allows maximum " +
+                $"{subscriptionPlan.MaxPossibleEntries} planned entries. Current: {currentCount}");
         }
 
         return ValidationResult.Success();
     }
 
-    public ValidationResult CanChangePlan(string username, PlanType newPlanType)
+    public ValidationResult CanChangePlan(PlanType newPlanType)
     {
         var newPlan = SubscriptionPlanFactory.CreatePlan(newPlanType);
-        
-        var ingredientStorage = storageManager.GetIngredientStorage(username);
-        var recipeStorage = storageManager.GetRecipeStorage(username);
-        var planStorage = storageManager.GetPlanStorage(username);
 
         var pantryCount = ingredientStorage.GetTotalQuantity();
         var recipeCount = recipeStorage.GetTotalQuantity();
@@ -82,25 +64,24 @@ public class PlanValidator(
 
         if (pantryCount > newPlan.MaxPantryItems)
         {
-            errors.Add($"Pantry items: {pantryCount} exceeds {newPlan.Type} plan limit of {newPlan.MaxPantryItems}");
+            errors.Add($"Pantry items: {pantryCount} exceeds " +
+                       $"{newPlan.Type} plan limit of {newPlan.MaxPantryItems}");
         }
 
         if (recipeCount > newPlan.MaxRecipes)
         {
-            errors.Add($"Recipes: {recipeCount} exceeds {newPlan.Type} plan limit of {newPlan.MaxRecipes}");
+            errors.Add($"Recipes: {recipeCount} exceeds " +
+                       $"{newPlan.Type} plan limit of {newPlan.MaxRecipes}");
         }
 
         if (planCount > newPlan.MaxPossibleEntries)
         {
-            errors.Add($"Meal plans: {planCount} exceeds {newPlan.Type} plan limit of {newPlan.MaxPossibleEntries}");
+            errors.Add($"Meal plans: {planCount} exceeds" +
+                       $" {newPlan.Type} plan limit of {newPlan.MaxPossibleEntries}");
         }
 
-        if (errors.Any())
-        {
-            var errorMessage = $"Cannot downgrade to {newPlan.Type} plan:\n" + string.Join("\n", errors);
-            return ValidationResult.Failure(errorMessage);
-        }
-
-        return ValidationResult.Success();
+        if (errors.Count == 0) return ValidationResult.Success();
+        var errorMessage = $"Cannot downgrade to {newPlan.Type} plan:\n" + string.Join("\n", errors);
+        return ValidationResult.Failure(errorMessage);
     }
 }

@@ -4,9 +4,12 @@ namespace RecipeManager.Entities;
 
 public class Recipe
 {
-    public string Name { get;  }
-    public List<string> Steps { get; }
-    public List<Ingredient> Ingredients { get; }
+    public string Name { get; set; } = string.Empty;
+    public List<string> Steps { get; } = new();
+    public List<Ingredient> Ingredients { get; set; }
+    
+    public Recipe() { }
+
 
     public Recipe(string name)
     {

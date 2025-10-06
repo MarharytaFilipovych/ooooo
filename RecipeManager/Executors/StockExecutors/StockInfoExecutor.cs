@@ -5,20 +5,12 @@ using RecipeManager.Storage;
 
 namespace RecipeManager.Executors.StockExecutors;
 
-public class StockInfoExecutor(IUserStorage userStorage, UserStorageManager storageManager) :
+public class StockInfoExecutor(IStorage<Ingredient> ingredientStorage) :
     ICommandExecutor<StockInfoCommand>
 {
     public ExecuteResult Execute(StockInfoCommand command)
     {
-        var currentUser = userStorage.GetCurrentUser();
-        if (currentUser == null)
-        {
-            Console.WriteLine("You must login first!");
-            return ExecuteResult.Continue;
-        }
-
-        var storage = storageManager.GetIngredientStorage(currentUser.Username);
-        storage.GetAll().ForEach(Console.WriteLine);
+        ingredientStorage.GetAll().ForEach(Console.WriteLine);
         return ExecuteResult.Continue;
     }
 }
