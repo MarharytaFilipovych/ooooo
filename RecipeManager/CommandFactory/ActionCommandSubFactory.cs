@@ -4,11 +4,14 @@ using RecipeManager.CommandDefinitions.ActionDefinitions;
 using RecipeManager.Executors.ActionExecutors;
 using RecipeManager.Storage.IngredientStorage;
 using RecipeManager.Storage.RecipeStorage;
+using RecipeManager.EventPublishing;
 
 namespace RecipeManager.CommandFactory;
 
-public class ActionCommandSubFactory(IRecipeStorage recipeStorage, IIngredientStorage ingredientStorage)
-    : ICommandSubFactory
+public class ActionCommandSubFactory(
+    IRecipeStorage recipeStorage, 
+    IIngredientStorage ingredientStorage,
+    IEventPublisher eventPublisher) : ICommandSubFactory
 {
     public void Create(Context context)
     {
@@ -19,12 +22,8 @@ public class ActionCommandSubFactory(IRecipeStorage recipeStorage, IIngredientSt
         actionRegistry.Register(new MissingAction());
         actionRegistry.Register(new CookAction());
         
-        context.Register(
-            new OptionDefinition(),
-            new OptionsExecutor(recipeStorage, actionRegistry));
+        context.Register(new OptionDefinition(), new OptionsExecutor(recipeStorage, actionRegistry));
         
-        context.Register(
-            new ActionDefinition(),
-            new ActionsExecutor(recipeStorage, ingredientStorage, actionRegistry));
+        context.Register(new ActionDefinition(), new ActionsExecutor(recipeStorage, ingredientStorage, actionRegistry, eventPublisher));
     }
 }
