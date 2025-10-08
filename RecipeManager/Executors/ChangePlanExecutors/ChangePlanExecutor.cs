@@ -6,7 +6,8 @@ using RecipeManager.Utils;
 
 namespace RecipeManager.Executors.ChangePlanExecutors;
 
-public class ChangePlanExecutor(ISessionStorage sessionStorage,
+public class ChangePlanExecutor(
+    ISessionStorage sessionStorage,
     IPlanValidator planValidator) : ICommandExecutor<ChangePlanCommand>
 {
     public ExecuteResult Execute(ChangePlanCommand command)
@@ -32,6 +33,7 @@ public class ChangePlanExecutor(ISessionStorage sessionStorage,
 
         var newPlan = SubscriptionPlanFactory.CreatePlan(command.NewPlanType);
         currentUser.Subscription = newPlan;
+        
         Console.WriteLine($"Successfully changed to {command.NewPlanType} plan!");
         Console.WriteLine($"Now you have available: Pantry - {newPlan.MaxPantryItems}, \n" +
                           $"Recipes - {newPlan.MaxRecipes}, \nEntries - {newPlan.MaxPossibleEntries}.");

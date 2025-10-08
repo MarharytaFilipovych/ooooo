@@ -1,14 +1,19 @@
 using RecipeManager.Commands;
 using RecipeManager.Commands.RecipeCommands;
 using RecipeManager.Entities;
-using RecipeManager.Storage;
+using RecipeManager.Storage.RecipeStorage;
 using RecipeManager.Storage.SessionStorage;
 using RecipeManager.Utils;
+using RecipeManager.EventPublishing;
+using RecipeManager.Events;
 
 namespace RecipeManager.Executors.RecipeExecutors;
 
-public class RecipeAddExecutor(ISessionStorage sessionStorage, IStorage<Recipe> recipeStorage, 
-    IPlanValidator planValidator) : ICommandExecutor<CommandAdd>
+public class RecipeAddExecutor(
+    ISessionStorage sessionStorage, 
+    IRecipeStorage recipeStorage, 
+    IPlanValidator planValidator,
+    IEventPublisher eventPublisher) : ICommandExecutor<CommandAdd>
 {
     public ExecuteResult Execute(CommandAdd command)
     {
@@ -22,14 +27,22 @@ public class RecipeAddExecutor(ISessionStorage sessionStorage, IStorage<Recipe> 
         if (!validationResult.IsValid)
         {
             Console.WriteLine(validationResult.ErrorMessage);
+            eventPublisher.Publish(new LimitReachedEvent("recipes"));
             return ExecuteResult.Continue;
         }
         
         var recipe = new Recipe(command.Name);
         
-        Console.WriteLine(recipeStorage.Add(recipe)
-            ? $"The recipe \"{command.Name}\" was successfully added!"
-            : "The recipe with such a name already exists!");
+        var added = recipeStorage.Add(recipe);
+        if (added)
+        {
+            eventPublisher.Publish(new RecipeCreatedEvent(command.Name));
+            Console.WriteLine($"The recipe \"{command.Name}\" was successfully added!");
+        }
+        else
+        {
+            Console.WriteLine("The recipe with such a name already exists!");
+        }
 
         return ExecuteResult.Continue;
     }

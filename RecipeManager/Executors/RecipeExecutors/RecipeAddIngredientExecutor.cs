@@ -1,12 +1,15 @@
 using RecipeManager.Commands;
 using RecipeManager.Commands.RecipeCommands;
 using RecipeManager.Entities;
-using RecipeManager.Storage;
+using RecipeManager.Storage.RecipeStorage;
+using RecipeManager.EventPublishing;
+using RecipeManager.Events;
 
 namespace RecipeManager.Executors.RecipeExecutors;
 
-public class RecipeAddIngredientExecutor(IStorage<Recipe> recipeStorage) : 
-    ICommandExecutor<CommandAddIngredient>
+public class RecipeAddIngredientExecutor(
+    IRecipeStorage recipeStorage,
+    IEventPublisher eventPublisher) : ICommandExecutor<CommandAddIngredient>
 {
     public ExecuteResult Execute(CommandAddIngredient command)
     {
@@ -28,6 +31,9 @@ public class RecipeAddIngredientExecutor(IStorage<Recipe> recipeStorage) :
         }
         
         recipe.AddIngredient(new Ingredient(command.IngredientName, command.Quantity, command.Unit));
+        
+        eventPublisher.Publish(new RecipeIngredientEvent(command.Name, command.IngredientName, command.Quantity, command.Unit));
+        
         Console.WriteLine($"Ingredient with a name \"{command.IngredientName}\" " +
                           $"was successfully added to this great recipe!");
         return ExecuteResult.Continue;

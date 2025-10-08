@@ -4,12 +4,16 @@ using RecipeManager.Entities;
 using RecipeManager.Storage;
 using RecipeManager.Storage.SessionStorage;
 using RecipeManager.Utils;
+using RecipeManager.EventPublishing;
+using RecipeManager.Events;
 
 namespace RecipeManager.Executors.PlanExecutors;
 
-public class PlanAddExecutor(ISessionStorage sessionStorage, 
-    IStorage<Plan> planStorage, IPlanValidator planValidator)
-    : ICommandExecutor<PlanAddCommand>
+public class PlanAddExecutor(
+    ISessionStorage sessionStorage, 
+    IStorage<Plan> planStorage, 
+    IPlanValidator planValidator,
+    IEventPublisher eventPublisher) : ICommandExecutor<PlanAddCommand>
 {
     public ExecuteResult Execute(PlanAddCommand command)
     {
@@ -23,15 +27,24 @@ public class PlanAddExecutor(ISessionStorage sessionStorage,
         if (!validationResult.IsValid)
         {
             Console.WriteLine(validationResult.ErrorMessage);
+            eventPublisher.Publish(new LimitReachedEvent("plans"));
             return ExecuteResult.Continue;
         }
 
         var plan = new Plan(command.Name, command.RecipeName, command.Date, command.ServingsMultiplier);
-        Console.WriteLine(
-            planStorage.Add(plan)
-                ? $"Plan \"{command.Name}\" was successfully added!"
-                : $"Plan with a name \"{command.Name}\" has already been added!"
-        );
+        
+        var added = planStorage.Add(plan);
+        if (added)
+        {
+            eventPublisher.Publish(new PlannedAddedEvent(command.RecipeName, command.Date, command.ServingsMultiplier ?? 1));
+            
+            Console.WriteLine($"Plan \"{command.Name}\" was successfully added!");
+        }
+        else
+        {
+            Console.WriteLine($"Plan with a name \"{command.Name}\" has already been added!");
+        }
+        
         return ExecuteResult.Continue;
     }
 }
